@@ -1,29 +1,24 @@
-import express from "express";
-import cors from "cors";
-import mongoose from "mongoose";
+import fastify from 'fastify';
 import dotenv from "dotenv";
-
 dotenv.config();
-const db_connection = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@binge-boss-db.41afdlo.mongodb.net/?retryWrites=true&w=majority`;
+import db from './config/index';
+import usersRoutes from './routes/usersRoutes';
 
-mongoose.connect(db_connection);
+const PORT = process.env.PORT || 3000;
+const API_URL = process.env.API_URL;
+const uri = process.env.MONGODB_URI as string;
 
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection failed: "));
-db.once("open", function () {
-  console.log("Connected to the database successfully");
+const server = fastify();
+server.register(db, { uri });
+server.register(usersRoutes);
+
+server.listen({ port: +PORT}, (err, address = API_URL as string) => {
+  if (err) {
+    console.error(err)
+    process.exit(1)
+  }
+  console.log(`Server listening at ${address}`)
 });
-const app = express();
-const port = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  res.send("Hello World! I'm Binge Boss");
-});
 
-app.listen(port, () => {
-  return console.log(`Starting Library app - port ${port}`);
-});
