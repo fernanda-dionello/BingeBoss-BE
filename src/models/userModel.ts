@@ -5,6 +5,12 @@ export interface UserAttrs {
     email: string;
     password: string;
 }
+export interface UserAttrsResult extends Document{
+  firstName: string;
+  lastName: string;
+  email: string;
+  password?: string;
+}
 
 export interface UserModel extends Model<UserDocument> {
     addOne(doc: UserAttrs): UserDocument;
@@ -14,6 +20,7 @@ export interface UserDocument extends Document {
     firstName: string;
     lastName: string;
     email: string;
+    password: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -33,7 +40,8 @@ export const userSchema: Schema = new Schema(
         },
         password: {
             type: String,
-            required: true
+            required: true,
+            select: false
         }
     },
     {

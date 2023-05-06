@@ -5,7 +5,7 @@ import {
 } from 'fastify';
 import fp from 'fastify-plugin';
 import { Db } from '../config/index';
-import { UserAttrs } from '../models/userModel';
+import { UserAttrs, UserAttrsResult } from '../models/userModel';
 import crypto from 'crypto';
 
 // Declaration merging
@@ -41,9 +41,10 @@ const UsersRoute: FastifyPluginAsync = async (server: FastifyInstance, options: 
             request.body.password = encryptPassword.digest('hex');
 
             const user = await User.addOne(request.body);
-            await user.save();
-            
-            return reply.code(201).send(user);
+            let userSaved: UserAttrsResult = await user.save();
+            userSaved = userSaved.toObject();
+            delete userSaved.password;
+            return reply.code(201).send(userSaved);
         } catch (error) {
             request.log.error(error);
             return reply.send(500);
