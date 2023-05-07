@@ -1,69 +1,21 @@
 import { 
   FastifyInstance, 
   FastifyPluginOptions, 
-  FastifyPluginAsync 
+  FastifyError
 } from 'fastify';
 import fp from 'fastify-plugin';
-import { Db } from '../config/index';
-import { UserAttrs, UserAttrsResult } from '../models/userModel';
-import crypto from 'crypto';
+import usersController from '../controllers/usersController';
+import { UserAttrs, UserParams } from '../models/usersModel';
 
-// Declaration merging
-declare module 'fastify' {
-    export interface FastifyInstance {
-        db: Db;
-    }
+function UsersRoute(
+    fastify: FastifyInstance,
+    options: FastifyPluginOptions,
+    next: (err?: FastifyError) => void
+){
+    fastify.get('/users', usersController.showAll);
+    fastify.get<{ Params: UserParams }>('/users/:id', usersController.showById);
+    fastify.post<{ Body: UserAttrs }>('/users', usersController.create);
+    next();
 }
 
-interface userParams {
-    id: string;
-}
-
-const UsersRoute: FastifyPluginAsync = async (server: FastifyInstance, options: FastifyPluginOptions) => {
-
-    server.get('/users', {}, async (request, reply) => {
-        try {
-            const { User } = server.db.models;
-            const users = await User.find({});
-            return reply.code(200).send(users);
-        } catch (error) {
-            request.log.error(error);
-            return reply.send(500);
-        }
-    });
-
-    server.post<{ Body: UserAttrs }>('/users', {}, async (request, reply) => {
-        try {
-            const { User } = server.db.models;
-            
-            const encryptPassword = crypto.createHash('sha1');
-            encryptPassword.update(request.body.password);
-            request.body.password = encryptPassword.digest('hex');
-
-            const user = await User.addOne(request.body);
-            let userSaved: UserAttrsResult = await user.save();
-            userSaved = userSaved.toObject();
-            delete userSaved.password;
-            return reply.code(201).send(userSaved);
-        } catch (error) {
-            request.log.error(error);
-            return reply.send(500);
-        }
-    });
- 
-    server.get<{ Params: userParams }>('/users/:id', {}, async (request, reply) => {
-        try {
-            const ID = request.params.id;
-            const { User } = server.db.models;
-            const user = await User.findById(ID);
-            if (!user) {
-                return reply.send(404);
-            }
-            return reply.code(200).send(user);
-        } catch (error) {
-            request.log.error(error);
-            return reply.send(400);
-        }
-    });
-};
 export default fp(UsersRoute);
