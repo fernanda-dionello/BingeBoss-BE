@@ -12,6 +12,11 @@ export interface UserParams {
     id: string;
 }
 
+export interface UserLoginAttrs {
+    email: string;
+    password: string;
+}
+
 export interface UserAttrsResult extends Document{
   firstName: string;
   lastName: string;
@@ -49,7 +54,7 @@ const userSchema = new mongoose.Schema(    {
     password: {
         type: String,
         required: true,
-        select: false
+        select: true
     }
 },
 {
