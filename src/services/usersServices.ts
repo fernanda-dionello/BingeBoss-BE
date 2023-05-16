@@ -1,5 +1,5 @@
 import User from '../models/usersModel';
-import validateUserId from './validators/usersValidators';
+import userValidators from './validators/usersValidators';
 import { FastifyError } from 'fastify';
 
 export default {
@@ -8,7 +8,7 @@ export default {
   },
 
   async getById(id: string){
-      validateUserId(id);             
+    userValidators.validateUserId(id);             
       const user = await User.findById(id).exec();
       
       if(user == null){
