@@ -18,7 +18,7 @@ export default {
   async search(request: any, reply: FastifyReply){
     try {
       const queryParams = request.query as searchQuery;
-      const result = await searchServices.search(queryParams);
+      const result = await searchServices.search(queryParams);   
       return reply.send(result);
     } catch (err: any) {
       if (err instanceof mongoose.Error.CastError) {
