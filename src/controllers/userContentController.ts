@@ -4,7 +4,7 @@ import {
 import userContentServices from '../services/userContentServices';
 import mongoose from 'mongoose';
 
-export type ContentType = 'movie' | 'series' | 'season' | 'episode'; 
+export type ContentType = 'movie' | 'tv' | 'season' | 'episode'; 
 export type ContentStatus = 'watched' | 'abandoned' | 'watching' | 'myList';
 
 export interface setContentStatusQuery {

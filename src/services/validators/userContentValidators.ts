@@ -3,8 +3,8 @@ import { errorHandler } from './common';
 import { setContentStatusQuery } from '../../controllers/userContentController';
 
 export const setContentStatusSchema = Joi.object({
-  status: Joi.string().valid("watched", "abandoned", "watching").required(),
-  type: Joi.string().valid("movie", "series", "season", "episode").required(),
+  status: Joi.string().valid("watched", "abandoned", "watching", "myList").required(),
+  type: Joi.string().valid("movie", "tv", "season", "episode").required(),
 })
 const validateSetContentStatusQuery = (query: setContentStatusQuery)=> {
   const result = setContentStatusSchema.validate(query);

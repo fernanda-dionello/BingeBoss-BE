@@ -1,4 +1,4 @@
-import { ContentType, setContentStatusQuery } from '../controllers/userContentController';
+import { setContentStatusQuery } from '../controllers/userContentController';
 import validateSetContentStatusQuery from './validators/userContentValidators';
 import UserContent from '../models/userContentModel';
 
