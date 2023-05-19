@@ -2,10 +2,10 @@ import {
   FastifyReply
 } from 'fastify';
 import userContentServices from '../services/userContentServices';
-import mongoose, { MongooseError } from 'mongoose';
+import mongoose from 'mongoose';
 
 export type ContentType = 'movie' | 'series' | 'season' | 'episode'; 
-export type ContentStatus = 'watched' | 'abandoned' | 'watching'
+export type ContentStatus = 'watched' | 'abandoned' | 'watching' | 'myList';
 
 export interface setContentStatusQuery {
   status: ContentStatus;
