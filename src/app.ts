@@ -6,6 +6,7 @@ import ConnectDB from './config/index';
 import searchRoutes from './routes/searchRoutes';
 import trendingRoutes from './routes/trendingRoutes';
 import loginRoutes from './routes/loginRoutes';
+import userContentRoutes from './routes/userContentRoutes';
 
 const PORT = process.env.PORT || 3000;
 const API_URL = process.env.API_URL;
@@ -27,6 +28,7 @@ server.register(function secured (fastify, options, next) {
   })
   fastify.register(searchRoutes)
   fastify.register(trendingRoutes)
+  fastify.register(userContentRoutes)
   next()
 })
 
