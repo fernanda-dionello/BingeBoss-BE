@@ -6,6 +6,7 @@ import ConnectDB from './config/index';
 import searchRoutes from './routes/searchRoutes';
 import trendingRoutes from './routes/trendingRoutes';
 import loginRoutes from './routes/loginRoutes';
+import usersRoutes from './routes/usersRoutes';
 import userContentRoutes from './routes/userContentRoutes';
 import contentRoutes from './routes/contentRoutes';
 
@@ -36,6 +37,7 @@ server.register(function secured (fastify, options, next) {
 
 server.register(function unsecured (fastify, options, next) {
   fastify.register(loginRoutes)
+  fastify.register(usersRoutes)
   next()
 })
 

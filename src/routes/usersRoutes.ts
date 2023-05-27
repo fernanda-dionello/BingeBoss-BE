@@ -7,7 +7,7 @@ import fp from 'fastify-plugin';
 import usersController from '../controllers/usersController';
 import { UserAttrs, UserParams } from '../models/usersModel';
 
-function UsersRoute(
+function UsersRoutes(
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
     next: (err?: FastifyError) => void
@@ -18,4 +18,4 @@ function UsersRoute(
     next();
 }
 
-export default fp(UsersRoute);
+export default fp(UsersRoutes);
