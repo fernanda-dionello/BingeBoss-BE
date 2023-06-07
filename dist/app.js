@@ -12,29 +12,54 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.server = void 0;
 const fastify_1 = __importDefault(require("fastify"));
-const mongoose_1 = __importDefault(require("mongoose"));
+const jwt_1 = __importDefault(require("@fastify/jwt"));
+const cors_1 = __importDefault(require("@fastify/cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const db_connection = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@binge-boss-db.41afdlo.mongodb.net/?retryWrites=true&w=majority`;
-mongoose_1.default.connect(db_connection);
-const db = mongoose_1.default.connection;
-db.on("error", console.error.bind(console, "connection failed: "));
-db.once("open", function () {
-    console.log("Connected to the database successfully");
+const index_1 = __importDefault(require("./config/index"));
+const searchRoutes_1 = __importDefault(require("./routes/searchRoutes"));
+const trendingRoutes_1 = __importDefault(require("./routes/trendingRoutes"));
+const loginRoutes_1 = __importDefault(require("./routes/loginRoutes"));
+const usersRoutes_1 = __importDefault(require("./routes/usersRoutes"));
+const userContentRoutes_1 = __importDefault(require("./routes/userContentRoutes"));
+const contentRoutes_1 = __importDefault(require("./routes/contentRoutes"));
+const PORT = process.env.PORT || 3000;
+const API_URL = process.env.API_URL;
+const secret = process.env.SECRET || '';
+exports.server = (0, fastify_1.default)();
+exports.server.register(jwt_1.default, {
+    secret: secret
 });
-// const app = express();
-const server = (0, fastify_1.default)();
-server.get('/ping', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
-    return 'pong\n';
-}));
-server.listen({ port: 3000 }, (err, address) => {
+exports.server.register(cors_1.default, {
+    origin: '*'
+});
+exports.server.register(index_1.default);
+exports.server.register(function secured(fastify, options, next) {
+    fastify.addHook("onRequest", (request, reply) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield request.jwtVerify();
+        }
+        catch (err) {
+            reply.code(403).send("Invalid Token");
+        }
+    }));
+    fastify.register(searchRoutes_1.default);
+    fastify.register(trendingRoutes_1.default);
+    fastify.register(userContentRoutes_1.default);
+    fastify.register(contentRoutes_1.default);
+    next();
+});
+exports.server.register(function unsecured(fastify, options, next) {
+    fastify.register(loginRoutes_1.default);
+    fastify.register(usersRoutes_1.default);
+    next();
+});
+exports.server.listen({ port: +PORT }, (err, address = API_URL) => {
     if (err) {
         console.error(err);
         process.exit(1);
     }
     console.log(`Server listening at ${address}`);
 });
-// app.use(cors());
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));

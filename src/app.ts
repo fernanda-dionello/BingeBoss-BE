@@ -20,7 +20,6 @@ server.register(jwt, {
   secret: secret
 });
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 server.register(cors, {
   origin: '*'
 });
