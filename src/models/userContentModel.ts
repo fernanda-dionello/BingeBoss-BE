@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 export interface UserContentAttrs {
     userId: string;
     contentId: string;
+    seasonNumber: string;
+    episodeNumber: string;
     contentType: string;
     contentStatus: string;
 }
@@ -15,6 +17,8 @@ export interface UserContentModel extends Model<UserContentDocument> {
 export interface UserContentDocument extends Document {
     userId: string;
     contentId: string;
+    seasonNumber: string;
+    episodeNumber: string;
     contentType: string;
     contentStatus: string;
 }
@@ -28,13 +32,21 @@ const userContentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    seasonNumber: {
+        type: String,
+        required: true
+    },
+    episodeNumber: {
+        type: String,
+        required: true
+    },
     contentType: {
         type: String,
         required: true
     },
     contentStatus: {
         type: String,
-        required: true,
+        required: true
     }
 },
 {
@@ -42,7 +54,7 @@ const userContentSchema = new mongoose.Schema({
 });
 
 userContentSchema.index(
-    { userId: 1, contentId: 1, contentType: 1 },
+    { userId: 1, contentId: 1, contentType: 1, seasonNumber: 1, episodeNumber: 1 },
     { unique: true }
 );
 
