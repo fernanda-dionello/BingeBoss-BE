@@ -10,6 +10,8 @@ export type ContentStatus = 'watched' | 'abandoned' | 'watching' | 'myList';
 export interface setContentStatusQuery {
   status: ContentStatus;
   type: ContentType;
+  seasonNumber?: number;
+  episodeNumber?: number;
 }
 
 export default {
