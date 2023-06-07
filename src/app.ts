@@ -1,5 +1,6 @@
 import fastify from 'fastify';
 import jwt from '@fastify/jwt';
+import cors from '@fastify/cors';
 import dotenv from "dotenv";
 dotenv.config();
 import ConnectDB from './config/index';
@@ -17,6 +18,11 @@ const secret = process.env.SECRET || '';
 export const server = fastify();
 server.register(jwt, {
   secret: secret
+});
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+server.register(cors, {
+  origin: '*'
 });
 
 server.register(ConnectDB);
