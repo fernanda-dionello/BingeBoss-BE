@@ -1,31 +1,33 @@
-import Joi from 'joi';
-import { errorHandler } from './common';
-import { setContentStatusQuery } from '../../controllers/userContentController';
+import Joi from "joi";
+import { errorHandler } from "./common";
+import { setContentStatusQuery } from "../../controllers/userContentController";
 
 export const setContentStatusSchema = Joi.object({
-  status: Joi.string().valid("watched", "abandoned", "watching", "myList").required(),
+  status: Joi.string()
+    .valid("watched", "abandoned", "watching", "myList")
+    .required(),
   type: Joi.string().valid("movie", "tv", "season", "episode").required(),
-  seasonNumber: Joi.number().when('type', {
-    is: 'season' || 'episode',
+  seasonNumber: Joi.number().when("type", {
+    is: "season" || "episode",
     then: Joi.number().required(),
-    otherwise: Joi.optional()
+    otherwise: Joi.optional(),
   }),
-  episodeNumber: Joi.number().when('type', {
-    is: 'episode',
+  episodeNumber: Joi.number().when("type", {
+    is: "episode",
     then: Joi.number().required(),
-    otherwise: Joi.optional()
+    otherwise: Joi.optional(),
   }),
-})
-const validateSetContentStatusQuery = (query: setContentStatusQuery)=> {
+});
+const validateSetContentStatusQuery = (query: setContentStatusQuery) => {
   const result = setContentStatusSchema.validate(query);
   if (result.error) {
     errorHandler(
       "Missing",
-      result.error.details[0].message,
+      result.error.details.map(({ message }) => message).join(";"),
       400,
       "400"
-    )
+    );
   }
-}
+};
 
 export default validateSetContentStatusQuery;

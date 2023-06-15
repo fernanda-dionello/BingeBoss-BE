@@ -1,19 +1,19 @@
-import { 
-  FastifyReply
-} from 'fastify';
-import mongoose from 'mongoose';
-import contentService from '../services/contentService';
-import { AxiosError } from 'axios';
+import { FastifyReply } from "fastify";
+import mongoose from "mongoose";
+import contentService from "../services/contentService";
+import { AxiosError } from "axios";
 
-export type ContentType = 'movie' | 'tv'; 
+export type ContentType = "movie" | "tv" | "season" | "episode";
 
 export interface contentDetailsQuery {
   language?: string;
   type: ContentType;
+  seasonNumber?: number;
+  episodeNumber?: number;
 }
 
 export default {
-  async getContentDetails(request: any, reply: FastifyReply){
+  async getContentDetails(request: any, reply: FastifyReply) {
     try {
       const queryParams = request.query as contentDetailsQuery;
       const { id } = request.params;
@@ -24,11 +24,11 @@ export default {
         return reply.code(404).send("Not found.");
       }
       if (err instanceof AxiosError) {
-        if (err.code == 'ERR_BAD_REQUEST') {
+        if (err.code == "ERR_BAD_REQUEST") {
           return reply.code(400).send("Bad request.");
         }
       }
       return reply.code(err.code || 500).send(err.message);
     }
   },
-}
+};
