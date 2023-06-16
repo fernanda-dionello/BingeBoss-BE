@@ -12,6 +12,7 @@ export interface searchQuery {
   language?: string;
   page?: number;
   type: ContentType;
+  genre?: string;
 }
 
 export default {
