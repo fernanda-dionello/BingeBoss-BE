@@ -10,6 +10,7 @@ import loginRoutes from './routes/loginRoutes';
 import usersRoutes from './routes/usersRoutes';
 import userContentRoutes from './routes/userContentRoutes';
 import contentRoutes from './routes/contentRoutes';
+import userRoutes from './routes/userRoutes';
 
 const PORT = process.env.PORT || 3000;
 const API_URL = process.env.API_URL;
@@ -37,6 +38,7 @@ server.register(function secured (fastify, options, next) {
   fastify.register(trendingRoutes)
   fastify.register(userContentRoutes)
   fastify.register(contentRoutes)
+  fastify.register(userRoutes)
   next()
 })
 

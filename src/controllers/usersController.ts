@@ -35,6 +35,20 @@ export default {
     }
   },
 
+  async deleteById(request: any, reply: FastifyReply){
+    try {
+      const { id } = request.params as UserParams;
+      const { id: userId } = request.user;
+      const user = await usersServices.deleteById(id, userId);
+      return reply.send(user);
+    } catch (err: any) {
+      if (err instanceof mongoose.Error.CastError) {
+        return reply.code(404).send("User not found.");
+      }
+      return reply.code(err.code || 500).send(err.message);
+    }
+  },
+
   async create(request: FastifyRequest, reply: FastifyReply){
     try {
       const user = new User(request.body as UserAttrs); 
