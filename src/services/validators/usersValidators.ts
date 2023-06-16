@@ -15,6 +15,13 @@ export default {
     }
   },
 
+  validateDeleteUserId(id: string, userId: string) {
+    if(userId !== id){
+      errorHandler("Forbidden", "User can only edit/delete their own profile", 403, "403");
+    }
+    this.validateUserId(id);
+  },
+
   validateUser(userFounded: UserAttrsResult[], user: UserLoginAttrs) {
     if (userFounded.length == 0) {
       errorHandler("Not found", "User not found");
