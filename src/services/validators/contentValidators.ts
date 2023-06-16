@@ -6,17 +6,19 @@ export const ContentDetailsSchema = Joi.object({
   language: Joi.string().optional(),
   type: Joi.string().valid("movie", "tv", "season", "episode").required(),
   seasonNumber: Joi.number().when("type", {
-    is: "season" || "episode",
+    is: "season",
     then: Joi.number().required(),
-    otherwise: Joi.optional(),
-  }),
+  })
+  .concat(Joi.number().when("type", {
+    is: "episode",
+    then: Joi.number().required(),
+  })),
   episodeNumber: Joi.number().when("type", {
     is: "episode",
     then: Joi.number().required(),
     otherwise: Joi.optional(),
   }),
 });
-
 const validateContentDetailsQuery = (query: contentDetailsQuery) => {
   const result = ContentDetailsSchema.validate(query);
   if (result.error) {

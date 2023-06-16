@@ -1,6 +1,7 @@
 import { searchQuery } from "../../controllers/searchController";
 import Joi from "joi";
 import { errorHandler } from "./common";
+import { movieGenresNames, multiGenresNames, personGendersNames, tvGenresNames } from '../utils/search.utils';
 
 export const SearchSchema = Joi.object({
   title: Joi.string().required(),
@@ -8,6 +9,17 @@ export const SearchSchema = Joi.object({
   language: Joi.string().optional(),
   page: Joi.number().optional(),
   type: Joi.string().valid("multi", "movie", "person", "tv").required(),
+  genre: Joi.string()
+    .when('type', { is: 'movie', then: Joi.string().valid(...movieGenresNames) })
+    .concat(
+      Joi.string()
+      .when('type', { is: 'tv', then: Joi.string().valid(...tvGenresNames) }))
+    .concat(
+      Joi.string()
+      .when('type', { is: 'person', then: Joi.string().valid(...personGendersNames) }))
+    .concat(
+      Joi.string()
+      .when('type', { is: 'multi', then: Joi.string().valid(...multiGenresNames) }))
 });
 const validateSearchQuery = (searchQuery: searchQuery) => {
   const result = SearchSchema.validate(searchQuery);
