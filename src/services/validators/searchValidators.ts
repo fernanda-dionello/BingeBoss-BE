@@ -4,7 +4,7 @@ import { errorHandler } from "./common";
 import { movieGenresNames, multiGenresNames, personGendersNames, tvGenresNames } from '../utils/search.utils';
 
 export const SearchSchema = Joi.object({
-  title: Joi.string().required(),
+  title: Joi.string().optional(),
   adult: Joi.boolean().optional(),
   language: Joi.string().optional(),
   page: Joi.number().optional(),
