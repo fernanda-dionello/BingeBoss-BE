@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 export type ContentType = 'multi' | 'movie' | 'person' | 'tv'; 
 
 export interface searchQuery {
-  title: string;
+  title?: string;
   adult?: boolean;
   language?: string;
   page?: number;

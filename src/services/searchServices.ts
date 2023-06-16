@@ -8,7 +8,17 @@ import { getTvGenreId } from './utils/search.utils';
 export default {
   async search(queryParams: searchQuery){  
     validateSearchQuery(queryParams);
-    const contents = await axios.get(`https://api.themoviedb.org/3/search/${queryParams.type}`, 
+    const contents = ((!queryParams.title) && (queryParams.type === 'movie' || queryParams.type === 'tv')) 
+    ? await axios.get(`https://api.themoviedb.org/3/discover/${queryParams.type}`, 
+    { 
+      headers: { Authorization: tokenTmdb },
+      params: {
+        include_adult:queryParams?.adult ?? false,
+        language:queryParams?.language ?? "en-US",
+        page:queryParams?.page ?? 1
+      }
+    }) 
+    : await axios.get(`https://api.themoviedb.org/3/search/${queryParams.type}`, 
     { 
       headers: { Authorization: tokenTmdb },
       params: {
@@ -18,7 +28,7 @@ export default {
         page:queryParams?.page ?? 1
       }
     });
-
+    
     if (queryParams.genre) {
       let genreId: number;
       switch (queryParams.type) {
