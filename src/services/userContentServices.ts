@@ -1,4 +1,4 @@
-import { setContentRatingQuery, setContentStatusQuery } from "../controllers/userContentController";
+import { getContentStatusQuery, setContentRatingQuery, setContentStatusQuery } from "../controllers/userContentController";
 import userContentValidators from "./validators/userContentValidators";
 import UserContent from "../models/userContentModel";
 import ContentRating from "../models/contentRatingModel";
@@ -49,6 +49,44 @@ export default {
     return userContentDb;
   },
 
+  async getContentStatus({
+    queryParams,
+    contentId,
+    userId,
+  }: {
+    queryParams: getContentStatusQuery;
+    contentId: string;
+    userId: string;
+  }) {
+    userContentValidators.validateGetContentStatusQuery(queryParams);
+
+    const seasonNumber =
+      queryParams.type === "season" || queryParams.type === "episode"
+        ? queryParams.seasonNumber
+        : "-1";
+    const episodeNumber =
+      queryParams.type === "episode" ? queryParams.episodeNumber : "-1";
+
+    const userContent = await UserContent.findOne(
+      {
+        userId,
+        contentId,
+        contentType: queryParams.type,
+        seasonNumber,
+        episodeNumber,
+      }
+    );
+    if(userContent == null){
+      const errHandler: FastifyError = {
+        name:"Not found",
+        message:"User content not found",
+        statusCode: 404,
+        code: "404"
+      }
+      throw errHandler;
+    }
+    return userContent
+  },
 
   async setContentRating({
     queryParams,

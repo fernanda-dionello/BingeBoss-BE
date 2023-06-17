@@ -12,6 +12,7 @@ function UserContentRoutes(
     next: (err?: FastifyError) => void
 ){
     fastify.post('/userContent/:id', userContentController.setContentStatus);
+    fastify.get('/userContent/:id', userContentController.getContentStatus);
     fastify.post('/userContent/:id/rating/:rate', userContentController.setContentRating);
     fastify.get('/userContent/:id/rating', userContentController.getContentRating);
     next();
