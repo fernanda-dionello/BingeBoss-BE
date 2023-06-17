@@ -1,8 +1,8 @@
 import Joi from "joi";
 import { errorHandler } from "./common";
-import { setContentStatusQuery } from "../../controllers/userContentController";
+import { setContentRatingQuery, setContentStatusQuery } from "../../controllers/userContentController";
 
-export const setContentStatusSchema = Joi.object({
+const setContentStatusSchema = Joi.object({
   status: Joi.string()
     .valid("watched", "abandoned", "watching", "myList")
     .required(),
@@ -18,16 +18,44 @@ export const setContentStatusSchema = Joi.object({
     otherwise: Joi.optional(),
   }),
 });
-const validateSetContentStatusQuery = (query: setContentStatusQuery) => {
-  const result = setContentStatusSchema.validate(query);
-  if (result.error) {
-    errorHandler(
-      "Missing",
-      result.error.details.map(({ message }) => message).join(";"),
-      400,
-      "400"
-    );
-  }
-};
 
-export default validateSetContentStatusQuery;
+const setContentRatingSchema = Joi.object({
+  type: Joi.string().valid("movie", "tv").required(),
+});
+
+export default {
+  validateSetContentStatusQuery(query: setContentStatusQuery) {
+    const result = setContentStatusSchema.validate(query);
+    if (result.error) {
+      errorHandler(
+        "Missing",
+        result.error.details.map(({ message }) => message).join(";"),
+        400,
+        "400"
+      );
+    }
+  },
+
+  validateSetContentRatingQuery(query: setContentRatingQuery) {
+    const result = setContentRatingSchema.validate(query);
+    if (result.error) {
+      errorHandler(
+        "Missing",
+        result.error.details.map(({ message }) => message).join(";"),
+        400,
+        "400"
+      );
+    }
+  },
+
+  validateSetContentRating(contentRating: string) {
+    if (!parseInt(contentRating) || parseInt(contentRating) < 1 || parseInt(contentRating) > 5){
+      errorHandler(
+        "Bad Request",
+        "Rating must be an integer from 1 to 5" ,
+        404,
+        "404"
+      );
+    }
+  },
+}

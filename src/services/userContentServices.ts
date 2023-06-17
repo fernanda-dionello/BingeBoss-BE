@@ -1,6 +1,8 @@
-import { setContentStatusQuery } from "../controllers/userContentController";
-import validateSetContentStatusQuery from "./validators/userContentValidators";
+import { setContentRatingQuery, setContentStatusQuery } from "../controllers/userContentController";
+import userContentValidators from "./validators/userContentValidators";
 import UserContent from "../models/userContentModel";
+import ContentRating from "../models/contentRatingModel";
+import { FastifyError } from 'fastify';
 
 export default {
   async setContentStatus({
@@ -12,7 +14,7 @@ export default {
     contentId: string;
     userId: string;
   }) {
-    validateSetContentStatusQuery(queryParams);
+    userContentValidators.validateSetContentStatusQuery(queryParams);
 
     const seasonNumber =
       queryParams.type === "season" || queryParams.type === "episode"
@@ -45,5 +47,66 @@ export default {
       return await userContent.save();
     }
     return userContentDb;
+  },
+
+
+  async setContentRating({
+    queryParams,
+    contentId,
+    userId,
+    contentRating,
+  }: {
+    queryParams: setContentRatingQuery;
+    contentId: string;
+    userId: string;
+    contentRating: string;
+  }) {
+    userContentValidators.validateSetContentRatingQuery(queryParams);
+    userContentValidators.validateSetContentRating(contentRating);
+
+    const contentRatingDb = await ContentRating.findOneAndUpdate(
+      {
+        userId,
+        contentId,
+        contentType: queryParams.type
+      },
+      { rating: parseInt(contentRating) },
+      { new: true }
+    );
+    if (!contentRatingDb) {
+      const newContentRating = new ContentRating({
+        userId,
+        contentId,
+        contentType: queryParams.type,
+        rating: parseInt(contentRating)
+      });
+
+      return await newContentRating.save();
+    }
+    return contentRatingDb;
+  },
+
+  async getContentRating({
+    queryParams,
+    contentId,
+    userId,
+  }: {
+    queryParams: setContentRatingQuery;
+    contentId: string;
+    userId: string;
+  }){
+    userContentValidators.validateSetContentRatingQuery(queryParams);             
+    const contentRating = await ContentRating.findOne({userId, contentId, contentType: queryParams.type}).exec();
+    
+    if(contentRating == null){
+      const errHandler: FastifyError = {
+        name:"Not found",
+        message:"Content rating not found",
+        statusCode: 404,
+        code: "404"
+      }
+      throw errHandler;
+    }
+    return contentRating
   },
 };
