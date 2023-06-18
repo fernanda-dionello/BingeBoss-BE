@@ -6,26 +6,55 @@ import validateSearchQuery from './validators/searchValidators';
 export default {
   async search(queryParams: searchQuery){  
     validateSearchQuery(queryParams);
-    const contents = ((!queryParams.title) && (queryParams.type === 'movie' || queryParams.type === 'tv')) 
-    ? await axios.get(`https://api.themoviedb.org/3/discover/${queryParams.type}`, 
-    { 
-      headers: { Authorization: tokenTmdb },
-      params: {
-        include_adult:queryParams?.adult ?? false,
-        language:queryParams?.language ?? "en-US",
-        page:queryParams?.page ?? 1
+    let contents;
+    if ((!queryParams.title) && ((queryParams.type === 'movie' || queryParams.type === 'tv' || queryParams.type === 'multi'))) {
+      if ((queryParams.type === 'movie' || queryParams.type === 'tv')) {
+        contents = await axios.get(`https://api.themoviedb.org/3/discover/${queryParams.type}`, 
+        { 
+          headers: { Authorization: tokenTmdb },
+          params: {
+            include_adult:queryParams?.adult ?? false,
+            language:queryParams?.language ?? "en-US",
+            page:queryParams?.page ?? 1
+          }
+        })
+        contents.data.results = contents.data.results.map((content: any) => ({...content, media_type: queryParams.type}))
+      } else {
+        contents = await axios.get(`https://api.themoviedb.org/3/discover/tv`, 
+        { 
+          headers: { Authorization: tokenTmdb },
+          params: {
+            include_adult:queryParams?.adult ?? false,
+            language:queryParams?.language ?? "en-US",
+            page:queryParams?.page ?? 1
+          }
+        })
+
+        contents.data.results = contents.data.results.map((tvContent: any) => ({...tvContent, media_type: 'tv'}))
+        const movieContents = await axios.get(`https://api.themoviedb.org/3/discover/movie`, 
+        { 
+          headers: { Authorization: tokenTmdb },
+          params: {
+            include_adult:queryParams?.adult ?? false,
+            language:queryParams?.language ?? "en-US",
+            page:queryParams?.page ?? 1
+          }
+        })
+        contents.data.results.push(...movieContents.data.results.map((movieContent: any) => ({...movieContent, media_type: 'movie'})));
       }
-    }) 
-    : await axios.get(`https://api.themoviedb.org/3/search/${queryParams.type}`, 
-    { 
-      headers: { Authorization: tokenTmdb },
-      params: {
-        query:queryParams?.title ?? '',
-        include_adult:queryParams?.adult ?? false,
-        language:queryParams?.language ?? "en-US",
-        page:queryParams?.page ?? 1
-      }
-    });
+    }
+    else {
+      contents = await axios.get(`https://api.themoviedb.org/3/search/${queryParams.type}`, 
+      { 
+        headers: { Authorization: tokenTmdb },
+        params: {
+          query:queryParams?.title ?? '',
+          include_adult:queryParams?.adult ?? false,
+          language:queryParams?.language ?? "en-US",
+          page:queryParams?.page ?? 1
+        }
+      });
+    }
     
     if (queryParams.genre) {
       const genres = queryParams.genre?.split(',');
