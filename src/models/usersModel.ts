@@ -8,6 +8,15 @@ export interface UserAttrs {
     password: string;
 }
 
+export interface UpdateUserAttrs {
+    firstName: string;
+    lastName: string;
+    email: string;
+    oldPassword?: string;
+    newPassword?: string;
+    confirmedPassword?: string;
+}
+
 export interface UserParams {
     id: string;
 }

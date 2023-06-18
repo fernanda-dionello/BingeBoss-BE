@@ -2,7 +2,7 @@ import {
   FastifyRequest,
   FastifyReply
 } from 'fastify';
-import { UserAttrs, UserAttrsResult, UserParams } from '../models/usersModel';
+import { UpdateUserAttrs, UserAttrs, UserAttrsResult, UserParams } from '../models/usersModel';
 import User from '../models/usersModel';
 import usersServices from '../services/usersServices';
 import mongoose from 'mongoose';
@@ -60,6 +60,24 @@ export default {
 
       return reply.code(201).send(userCreated);
     } catch (err: any) {
+      if(err.code == "11000"){
+        return reply.code(403).send("This email is already in use.");
+      }
+      return reply.code(err.code || 500).send(err.message);
+    }
+  },
+
+  async updatebyId(request: any, reply: FastifyReply){
+    try {
+      const user = request.body as UpdateUserAttrs; 
+      const { id } = request.params as UserParams;
+      const { id: userId } = request.user;
+      const updatedUser = await usersServices.updateById(user, id, userId);
+      return reply.send(updatedUser);
+    } catch (err: any) {
+      if (err instanceof mongoose.Error.CastError) {
+        return reply.code(404).send("User not found.");
+      }
       if(err.code == "11000"){
         return reply.code(403).send("This email is already in use.");
       }

@@ -13,6 +13,7 @@ function UsersRoutes(
     next: (err?: FastifyError) => void
 ){
     fastify.get<{ Params: UserParams }>('/users/:id', usersController.showById);
+    fastify.put<{ Params: UserParams }>('/users/:id', usersController.updatebyId);
     fastify.delete<{ Params: UserParams }>('/users/:id', usersController.deleteById);
     next();
 }
