@@ -1,4 +1,5 @@
-import User from '../models/usersModel';
+import { generateCrypto } from '../controllers/utils/crypto';
+import User, { UpdateUserAttrs } from '../models/usersModel';
 import userValidators from './validators/usersValidators';
 import { FastifyError } from 'fastify';
 
@@ -38,5 +39,45 @@ export default {
       throw errHandler;
     }
     return user
+  },
+
+  async updateById(userBody: UpdateUserAttrs, id: string, userId: string){
+    userValidators.validateUpdateUserId(id, userId, userBody);      
+    
+    const user = await User.findById(id).exec();
+    if(user == null){
+      const errHandler: FastifyError = {
+        name:"Not found",
+        message:"User not found",
+        statusCode: 404,
+        code: "404"
+      }
+      throw errHandler;
+    }
+    userBody.oldPassword && userValidators.validateUpdateUserPassword(userBody, user);
+
+    const password = userBody.newPassword ? generateCrypto(userBody.newPassword) : user.password;
+    const updatedUser = await User.findByIdAndUpdate(
+      {_id: id}, 
+      {
+        firstName: userBody.firstName,
+        lastName: userBody.lastName,
+        email: userBody.email,
+        password
+    
+      },
+      { new: true }
+      ).exec();
+    
+    if(updatedUser == null){
+      const errHandler: FastifyError = {
+        name:"Not found",
+        message:"User not found",
+        statusCode: 404,
+        code: "404"
+      }
+      throw errHandler;
+    }
+    return updatedUser
   }
 }
