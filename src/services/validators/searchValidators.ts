@@ -4,7 +4,7 @@ import { errorHandler } from "./common";
 import { multiGenresIds } from '../utils/search.utils';
 
 export const SearchSchema = Joi.object({
-  title: Joi.string().optional(),
+  title: Joi.string().optional().allow(''),
   adult: Joi.boolean().optional(),
   language: Joi.string().optional(),
   page: Joi.number().optional(),
