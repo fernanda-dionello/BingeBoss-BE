@@ -28,6 +28,7 @@ export default {
       headers: { Authorization: tokenTmdb },
       params: {
         language: queryParams?.language ?? "en-US",
+        append_to_response: 'credits'
       },
     });
     return contents.data;
