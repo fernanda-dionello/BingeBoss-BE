@@ -4,32 +4,26 @@ import { contentCommentQuery, contentDetailsQuery } from "../controllers/content
 import contentValidators from './validators/contentValidators';
 import ContentComment from "../models/contentCommentModel";
 import { FastifyError } from 'fastify';
+import { getSearchUrl } from './utils/search.utils';
 
 export default {
   async getContentDetails(queryParams: contentDetailsQuery, id: string) {
     contentValidators.validateContentDetailsQuery(queryParams);
-    const seasonNumber =
-      queryParams.type === "season" || queryParams.type === "episode"
-        ? queryParams.seasonNumber
+    const seasonNumber: string =
+      ((queryParams.type === "season" || queryParams.type === "episode") && queryParams.seasonNumber)
+        ? queryParams.seasonNumber?.toString()
         : "-1";
-    const episodeNumber =
-      queryParams.type === "episode" ? queryParams.episodeNumber : "-1";
-    let url = "https://api.themoviedb.org/3";
-    switch (queryParams.type) {
-      case "tv":
-        url = `${url}/${queryParams.type}/${id}`;
-        break;
-      case "movie":
-        url = `${url}/${queryParams.type}/${id}`;
-        break;
-      case "season":
-        url = `${url}/tv/${id}/${queryParams.type}/${seasonNumber}`;
-        break;
-      case "episode":
-        url = `${url}/tv/${id}/season/${seasonNumber}/${queryParams.type}/${episodeNumber}`;
-        break;
-      default:
-    }
+    const episodeNumber: string =
+      (queryParams.type === "episode" && queryParams.episodeNumber) 
+        ? queryParams.episodeNumber?.toString() 
+        : "-1";
+    const url = getSearchUrl({
+      id,
+      type: queryParams.type,
+      seasonNumber,
+      episodeNumber
+    });
+    
     const contents = await axios.get(url, {
       headers: { Authorization: tokenTmdb },
       params: {
@@ -52,12 +46,14 @@ export default {
   }) {
     contentValidators.validateContentCommentQuery(queryParams);
 
-    const seasonNumber =
-       queryParams.type === "episode"
-        ? queryParams.seasonNumber
+    const seasonNumber: string =
+       (queryParams.type === "episode" && queryParams.seasonNumber)
+        ? queryParams.seasonNumber?.toString()
         : "-1";
-    const episodeNumber =
-      queryParams.type === "episode" ? queryParams.episodeNumber : "-1";
+    const episodeNumber: string =
+      (queryParams.type === "episode" && queryParams.episodeNumber) 
+        ? queryParams.episodeNumber?.toString() 
+        : "-1";
 
     const contentComment = new ContentComment({
       userId,
@@ -80,12 +76,14 @@ export default {
   }) {
     contentValidators.validateContentCommentQuery(queryParams);
 
-    const seasonNumber =
-      queryParams.type === "episode"
-        ? queryParams.seasonNumber
+    const seasonNumber: string =
+      (queryParams.type === "episode" && queryParams.seasonNumber)
+        ? queryParams.seasonNumber?.toString()
         : "-1";
-    const episodeNumber =
-      queryParams.type === "episode" ? queryParams.episodeNumber : "-1";
+    const episodeNumber: string =
+      (queryParams.type === "episode" && queryParams.episodeNumber) 
+        ? queryParams.episodeNumber?.toString() 
+        : "-1";
 
     const contentComment = await ContentComment.find(
       {

@@ -184,3 +184,33 @@ export const movieGenresIds = movieGenres.map((genre) => genre.id);
 export const personGendersIds = personGenders.map((gender) => gender.id);
 
 export const multiGenresIds = multiGenres.map((genre) => genre.id);
+
+export const getSearchUrl = ({
+  id, 
+  type, 
+  seasonNumber, 
+  episodeNumber
+}: {
+  id: string, 
+  type: string, 
+  seasonNumber: string, 
+  episodeNumber: string
+}): string => {
+  let url = "https://api.themoviedb.org/3";
+  switch (type) {
+    case "tv":
+      url = `${url}/${type}/${id}`;
+      break;
+    case "movie":
+      url = `${url}/${type}/${id}`;
+      break;
+    case "season":
+      url = `${url}/tv/${id}/${type}/${seasonNumber}`;
+      break;
+    case "episode":
+      url = `${url}/tv/${id}/season/${seasonNumber}/${type}/${episodeNumber}`;
+      break;
+    default:
+  }
+  return url;
+}

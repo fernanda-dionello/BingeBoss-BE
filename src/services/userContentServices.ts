@@ -16,12 +16,15 @@ export default {
   }) {
     userContentValidators.validateSetContentStatusQuery(queryParams);
 
-    const seasonNumber =
-      queryParams.type === "season" || queryParams.type === "episode"
-        ? queryParams.seasonNumber
+    const seasonNumber: string =
+      ((queryParams.type === "season" || queryParams.type === "episode")
+        && queryParams.seasonNumber)
+        ? queryParams.seasonNumber.toString()
         : "-1";
-    const episodeNumber =
-      queryParams.type === "episode" ? queryParams.episodeNumber : "-1";
+    const episodeNumber: string =
+      (queryParams.type === "episode" && queryParams.episodeNumber) 
+        ? queryParams.episodeNumber.toString() 
+        : "-1";
 
     const userContentDb = await UserContent.findOneAndUpdate(
       {
@@ -60,12 +63,16 @@ export default {
   }) {
     userContentValidators.validateGetContentStatusQuery(queryParams);
 
-    const seasonNumber =
-      queryParams.type === "season" || queryParams.type === "episode"
-        ? queryParams.seasonNumber
+    const seasonNumber: string =
+      ((queryParams.type === "season" || queryParams.type === "episode")
+        && queryParams.seasonNumber)
+        ? queryParams.seasonNumber.toString()
         : "-1";
-    const episodeNumber =
-      queryParams.type === "episode" ? queryParams.episodeNumber : "-1";
+
+    const episodeNumber: string =
+      (queryParams.type === "episode" && queryParams.episodeNumber) 
+      ? queryParams.episodeNumber.toString()
+      : "-1";
 
     const userContent = await UserContent.findOne(
       {
