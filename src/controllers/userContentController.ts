@@ -33,7 +33,7 @@ export default {
       const { id: contentId } = request.params;
       const { id: userId } = request.user;
       const result = await userContentServices.setContentStatus({queryParams, contentId, userId});
-      return reply.send(result);
+      return reply.code(201).send(result);
     } catch (err: any) {
       if (err instanceof mongoose.Error.CastError) {
         return reply.code(404).send("Not found.");
@@ -66,7 +66,7 @@ export default {
       const { id: contentId, rate: contentRating } = request.params;
       const { id: userId } = request.user;
       const result = await userContentServices.setContentRating({queryParams, contentId, userId, contentRating});
-      return reply.send(result);
+      return reply.code(201).send(result);
     } catch (err: any) {
       if (err instanceof mongoose.Error.CastError) {
         return reply.code(404).send("Not found.");

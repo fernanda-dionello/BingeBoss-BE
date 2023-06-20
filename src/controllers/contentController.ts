@@ -48,7 +48,7 @@ export default {
       const { id: userId } = request.user;
       const {comment} = request.body as ContentCommentAttrs; 
       const result = await contentService.setContentComment({queryParams, contentId, userId, comment});
-      return reply.send(result);
+      return reply.code(201).send(result);
     } catch (err: any) {
       if (err instanceof mongoose.Error.CastError) {
         return reply.code(404).send("Not found.");
