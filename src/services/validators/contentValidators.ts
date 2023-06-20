@@ -1,4 +1,4 @@
-import { contentDetailsQuery } from "../../controllers/contentController";
+import { contentCommentQuery, contentDetailsQuery } from "../../controllers/contentController";
 import Joi from "joi";
 import { errorHandler } from "./common";
 
@@ -19,16 +19,43 @@ export const ContentDetailsSchema = Joi.object({
     otherwise: Joi.optional(),
   }),
 });
-const validateContentDetailsQuery = (query: contentDetailsQuery) => {
-  const result = ContentDetailsSchema.validate(query);
-  if (result.error) {
-    errorHandler(
-      "Missing",
-      result.error.details.map(({ message }) => message).join(";"),
-      400,
-      "400"
-    );
-  }
-};
 
-export default validateContentDetailsQuery;
+const contentCommentSchema = Joi.object({
+  type: Joi.string().valid("movie", "episode").required(),
+  seasonNumber: Joi.number().when("type", {
+    is: "episode",
+    then: Joi.number().required(),
+    otherwise: Joi.optional(),
+  }),
+  episodeNumber: Joi.number().when("type", {
+    is: "episode",
+    then: Joi.number().required(),
+    otherwise: Joi.optional(),
+  }),
+});
+
+export default {
+  validateContentDetailsQuery(query: contentDetailsQuery){
+    const result = ContentDetailsSchema.validate(query);
+    if (result.error) {
+      errorHandler(
+        "Missing",
+        result.error.details.map(({ message }) => message).join(";"),
+        400,
+        "400"
+      );
+    }
+  },
+  validateContentCommentQuery(query: contentCommentQuery) {
+    const result = contentCommentSchema.validate(query);
+    if (result.error) {
+      errorHandler(
+        "Missing",
+        result.error.details.map(({ message }) => message).join(";"),
+        400,
+        "400"
+      );
+    }
+  },
+
+}

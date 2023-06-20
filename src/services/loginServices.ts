@@ -12,7 +12,7 @@ export default {
       id: userFounded[0].id,
       firstName: userFounded[0].firstName,
       lastName: userFounded[0].lastName,
-  }, { expiresIn: "1h" });
+  }, { expiresIn: "24h" });
     return token;
   }
 }
