@@ -3,6 +3,9 @@ import userContentValidators from "./validators/userContentValidators";
 import UserContent from "../models/userContentModel";
 import ContentRating from "../models/contentRatingModel";
 import { FastifyError } from 'fastify';
+import { getContentAmount, getContentRuntime, getContentUrl } from './utils/content.utils';
+import axios from 'axios';
+import { tokenTmdb } from '../config/commonVariables';
 
 export default {
   async setContentStatus({
@@ -26,6 +29,33 @@ export default {
         ? queryParams.episodeNumber.toString() 
         : "-1";
 
+    let runtime = 0;
+    let amount = 0;
+    let episodeAmount = 0;
+    let movieAmount = 0;
+    if (queryParams.status === 'watched') {
+      const url = getContentUrl({
+        id: contentId,
+        type: queryParams.type,
+        seasonNumber,
+        episodeNumber
+      });
+      
+      const contents = await axios.get(url, {
+        headers: { Authorization: tokenTmdb },
+        params: {
+          language: "en-US",
+        },
+      });
+      runtime = getContentRuntime(contents.data, queryParams.type);
+      amount = getContentAmount(contents.data, queryParams.type);
+      episodeAmount = (queryParams.type === 'episode' || queryParams.type === 'season') 
+      ? amount 
+      : 0;
+      movieAmount = queryParams.type === 'movie' 
+      ? amount
+      : 0;
+    }
     const userContentDb = await UserContent.findOneAndUpdate(
       {
         userId,
@@ -34,7 +64,11 @@ export default {
         seasonNumber,
         episodeNumber,
       },
-      { contentStatus: queryParams.status },
+      { contentStatus: queryParams.status,
+        contentRuntime: runtime,
+        contentEpisodes: episodeAmount,
+        contentMovie: movieAmount
+      },
       { new: true }
     );
     if (!userContentDb) {
@@ -45,10 +79,13 @@ export default {
         episodeNumber,
         contentType: queryParams.type,
         contentStatus: queryParams.status,
+        contentRuntime: runtime,
+        contentEpisodes: episodeAmount,
+        contentMovie: movieAmount
       });
 
       return await userContent.save();
-    }
+    } 
     return userContentDb;
   },
 

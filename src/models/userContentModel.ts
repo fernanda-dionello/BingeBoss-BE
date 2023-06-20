@@ -21,6 +21,9 @@ export interface UserContentDocument extends Document {
     episodeNumber: string;
     contentType: string;
     contentStatus: string;
+    contentRuntime: number;
+    contentEpisodes: number;
+    contentMovie: number;
 }
 
 const userContentSchema = new mongoose.Schema({
@@ -47,7 +50,19 @@ const userContentSchema = new mongoose.Schema({
     contentStatus: {
         type: String,
         required: true
-    }
+    },
+    contentRuntime: {
+        type: Number,
+        required: true
+    },
+    contentEpisodes: {
+        type: Number,
+        required: true
+    },
+    contentMovie: {
+        type: Number,
+        required: true
+    },
 },
 {
     timestamps: true

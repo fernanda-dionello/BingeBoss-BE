@@ -4,7 +4,7 @@ import { contentCommentQuery, contentDetailsQuery } from "../controllers/content
 import contentValidators from './validators/contentValidators';
 import ContentComment from "../models/contentCommentModel";
 import { FastifyError } from 'fastify';
-import { getSearchUrl } from './utils/search.utils';
+import { getContentUrl } from './utils/content.utils';
 
 export default {
   async getContentDetails(queryParams: contentDetailsQuery, id: string) {
@@ -17,7 +17,7 @@ export default {
       (queryParams.type === "episode" && queryParams.episodeNumber) 
         ? queryParams.episodeNumber?.toString() 
         : "-1";
-    const url = getSearchUrl({
+    const url = getContentUrl({
       id,
       type: queryParams.type,
       seasonNumber,
