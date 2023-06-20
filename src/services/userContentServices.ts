@@ -3,7 +3,7 @@ import userContentValidators from "./validators/userContentValidators";
 import UserContent from "../models/userContentModel";
 import ContentRating from "../models/contentRatingModel";
 import { FastifyError } from 'fastify';
-import { getContentAmount, getContentRuntime, getContentUrl } from './utils/content.utils';
+import { getContentAmount, getContentRuntime, getContentUrl, getDataHR } from './utils/content.utils';
 import axios from 'axios';
 import { tokenTmdb } from '../config/commonVariables';
 
@@ -190,5 +190,38 @@ export default {
       throw errHandler;
     }
     return contentRating
+  },
+
+  async getContentConsumption(userId: string) {             
+    const watchedContent = await UserContent.find({userId, contentStatus: 'watched'}).exec();
+    const consumption = watchedContent.reduce((result, content) => {
+      return { 
+        totalRuntime: result.totalRuntime + content.contentRuntime, 
+        totalEpisodes: result.totalEpisodes + content.contentEpisodes,
+        totalMovies: result.totalMovies + content.contentMovie,  
+       }
+      },
+      { totalRuntime: 0 as number, totalEpisodes: 0 as number, totalMovies: 0 as number }
+    );
+    const totalRuntime =  getDataHR(consumption.totalRuntime);
+    
+    if(watchedContent == null){
+      const errHandler: FastifyError = {
+        name:"Not found",
+        message:"Content rating not found",
+        statusCode: 404,
+        code: "404"
+      }
+      throw errHandler;
+    }
+    return {
+      ...consumption,
+      totalYears: totalRuntime.years,
+      totalMonths: totalRuntime.months,
+      totalWeeks: totalRuntime.weeks,
+      totalDays: totalRuntime.days,
+      totalHours: totalRuntime.hours,
+      totalMinutes: totalRuntime.minutes
+    }
   },
 };
