@@ -89,4 +89,17 @@ export default {
       return reply.code(err.code || 500).send(err.message);
     }
   },
+
+  async getContentConsumption(request: any, reply: FastifyReply){
+    try {
+      const { id: userId } = request.user;
+      const result = await userContentServices.getContentConsumption(userId);
+      return reply.send(result);
+    } catch (err: any) {
+      if (err instanceof mongoose.Error.CastError) {
+        return reply.code(404).send("Not found.");
+      }
+      return reply.code(err.code || 500).send(err.message);
+    }
+  },
 }
