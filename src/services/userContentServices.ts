@@ -3,9 +3,11 @@ import userContentValidators from "./validators/userContentValidators";
 import UserContent from "../models/userContentModel";
 import ContentRating from "../models/contentRatingModel";
 import { FastifyError } from 'fastify';
-import { getContentAmount, getContentRuntime, getContentUrl, getDataHR } from './utils/content.utils';
+import { getContentAmount, getContentName, getContentRuntime, getContentUrl, getDataHR } from './utils/content.utils';
 import axios from 'axios';
 import { tokenTmdb } from '../config/commonVariables';
+import { openai } from '../config/openAI';
+import { getOpenAIRecommendation } from './utils/userContent.utils';
 
 export default {
   async setContentStatus({
@@ -33,6 +35,7 @@ export default {
     let amount = 0;
     let episodeAmount = 0;
     let movieAmount = 0;
+    let name = '';
     if (queryParams.status === 'watched') {
       const url = getContentUrl({
         id: contentId,
@@ -49,6 +52,7 @@ export default {
       });
       runtime = getContentRuntime(contents.data, queryParams.type);
       amount = getContentAmount(contents.data, queryParams.type);
+      name = getContentName(contents.data, queryParams.type);
       episodeAmount = (queryParams.type === 'episode' || queryParams.type === 'season') 
       ? amount 
       : 0;
@@ -67,7 +71,8 @@ export default {
       { contentStatus: queryParams.status,
         contentRuntime: runtime,
         contentEpisodes: episodeAmount,
-        contentMovie: movieAmount
+        contentMovie: movieAmount,
+        contentName: name
       },
       { new: true }
     );
@@ -81,7 +86,8 @@ export default {
         contentStatus: queryParams.status,
         contentRuntime: runtime,
         contentEpisodes: episodeAmount,
-        contentMovie: movieAmount
+        contentMovie: movieAmount,
+        contentName: name
       });
 
       return await userContent.save();
@@ -223,5 +229,32 @@ export default {
       totalHours: totalRuntime.hours,
       totalMinutes: totalRuntime.minutes
     }
+  },
+
+  async getContentRecommendation(userId: string) {             
+    const watchedContent = await UserContent.find(
+      {
+        userId, 
+        contentStatus: 'watched', 
+        $or:[
+          {contentType: "movie"},
+          {contentType:"tv"}
+        ]}
+      ).exec();
+    
+    if(watchedContent == null){
+      const errHandler: FastifyError = {
+        name:"Not found",
+        message:"Content rating not found",
+        statusCode: 404,
+        code: "404"
+      }
+      throw errHandler;
+    }
+    const watchedContentNames = watchedContent.map((content) => content.contentName);
+    
+    const chatCompletionContent = await getOpenAIRecommendation(watchedContentNames);
+    
+    return chatCompletionContent
   },
 };

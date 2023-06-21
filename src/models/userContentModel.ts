@@ -24,6 +24,7 @@ export interface UserContentDocument extends Document {
     contentRuntime: number;
     contentEpisodes: number;
     contentMovie: number;
+    contentName: string;
 }
 
 const userContentSchema = new mongoose.Schema({
@@ -61,6 +62,10 @@ const userContentSchema = new mongoose.Schema({
     },
     contentMovie: {
         type: Number,
+        required: true
+    },
+    contentName: {
+        type: String,
         required: true
     },
 },
