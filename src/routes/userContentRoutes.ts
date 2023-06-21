@@ -16,6 +16,7 @@ function UserContentRoutes(
     fastify.post('/userContent/:id/rating/:rate', userContentController.setContentRating);
     fastify.get('/userContent/:id/rating', userContentController.getContentRating);
     fastify.get('/userContent/consumption', userContentController.getContentConsumption);
+    fastify.get('/userContent/recommendation', userContentController.getContentRecommendation);
     next();
 }
 

@@ -47,6 +47,10 @@ export const getContentAmount = (content: any, type: string) => {
   return type === 'season' ? content.episodes.length : 1;
 }
 
+export const getContentName = (content: any, type: string) => {
+  return type === 'movie' ? content.title : content.name;
+}
+
 export const getDataHR = (newMinutes: number) => {
   const MINS_PER_YEAR = 24 * 365 * 60
   const MINS_PER_MONTH = 24 * 30 * 60
