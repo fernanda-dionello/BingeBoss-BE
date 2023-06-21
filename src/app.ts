@@ -12,8 +12,8 @@ import userContentRoutes from './routes/userContentRoutes';
 import contentRoutes from './routes/contentRoutes';
 import userRoutes from './routes/userRoutes';
 
-const PORT = process.env.PORT || 3000;
-const API_URL = process.env.API_URL;
+const PORT = parseInt(process.env.PORT ?? '3000');
+const HOST = ("RENDER" in process.env) ? `0.0.0.0` : `localhost`;
 const secret = process.env.SECRET || '';
 
 export const server = fastify();
@@ -49,7 +49,7 @@ server.register(function unsecured (fastify, options, next) {
 })
 
 
-server.listen({ port: +PORT}, (err, address = API_URL as string) => {
+server.listen({host: HOST, port: PORT }, (err, address) => {
   if (err) {
     console.error(err)
     process.exit(1)
