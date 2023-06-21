@@ -6,8 +6,7 @@ import { FastifyError } from 'fastify';
 import { getContentAmount, getContentName, getContentRuntime, getContentUrl, getDataHR } from './utils/content.utils';
 import axios from 'axios';
 import { tokenTmdb } from '../config/commonVariables';
-import { openai } from '../config/openAI';
-import { getOpenAIRecommendation } from './utils/userContent.utils';
+import { fetchMultipleUrls, getOpenAIRecommendation, getRecommendedContentsDetailsUrlParams } from './utils/userContent.utils';
 
 export default {
   async setContentStatus({
@@ -254,7 +253,9 @@ export default {
     const watchedContentNames = watchedContent.map((content) => content.contentName);
     
     const chatCompletionContent = await getOpenAIRecommendation(watchedContentNames);
-    
-    return chatCompletionContent
+
+    const recommendedContentsUrlParams = getRecommendedContentsDetailsUrlParams(chatCompletionContent);
+    const recommendedContents = await fetchMultipleUrls(recommendedContentsUrlParams);
+    return recommendedContents
   },
 };
