@@ -51,6 +51,28 @@ export const getContentName = (content: any, type: string) => {
   return type === 'movie' ? content.title : content.name;
 }
 
+export const getContentImage = (content: any, type: string) => {
+  let imagePath = '';
+  switch (type) {
+    case 'person':
+      imagePath = content.profile_path;
+      break;
+    case 'movie':
+    case 'tv':
+      imagePath = content.backdrop_path;
+      break;
+    case 'season':
+      imagePath = content.poster_path;
+      break;
+    case 'episode':
+      imagePath = content.still_path;
+      break;
+    default:
+      break;
+  }
+  return imagePath;
+}
+
 export const getDataHR = (newMinutes: number) => {
   const MINS_PER_YEAR = 24 * 365 * 60
   const MINS_PER_MONTH = 24 * 30 * 60
