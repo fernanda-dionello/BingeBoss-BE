@@ -51,6 +51,9 @@ const setContentRatingSchema = Joi.object({
   type: Joi.string().valid("movie", "tv").required(),
 });
 
+const getContentByStatusSchema = Joi.object({
+  status: Joi.string().valid("watching", "watched", "abandoned", "myList").required(),
+});
 export default {
   validateSetContentStatusQuery(query: setContentStatusQuery) {
     const result = setContentStatusSchema.validate(query);
@@ -93,6 +96,16 @@ export default {
       errorHandler(
         "Bad Request",
         "Rating must be an integer from 1 to 5"
+      );
+    }
+  },
+
+  validateGetContentByStatusParam(status: string) {
+    const result = getContentByStatusSchema.validate({status});
+    if (result.error) {
+      errorHandler(
+        "Bad Request",
+        result.error.details.map(({ message }) => message).join(";"),
       );
     }
   },

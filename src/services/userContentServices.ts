@@ -137,6 +137,22 @@ export default {
     return userContent
   },
 
+  async getContentByStatus(
+    userId: string,
+    contentStatus: string,
+  ) {
+    userContentValidators.validateGetContentByStatusParam(contentStatus);
+
+    const userContent = await UserContent.find(
+      {
+        userId,
+        contentStatus: contentStatus,
+      }
+    ).exec();
+
+    return userContent
+  },
+
   async setContentRating({
     queryParams,
     contentId,

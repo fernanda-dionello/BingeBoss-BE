@@ -60,6 +60,20 @@ export default {
     }
   },
 
+  async getContentByStatus(request: any, reply: FastifyReply){
+    try {
+      const { id: userId } = request.user;
+      const { status }   = request.params;
+      const result = await userContentServices.getContentByStatus(userId, status);
+      return reply.send(result);
+    } catch (err: any) {
+      if (err instanceof mongoose.Error.CastError) {
+        return reply.code(404).send("Not found.");
+      }
+      return reply.code(err.code || 500).send(err.message);
+    }
+  },
+
   async setContentRating(request: any, reply: FastifyReply){
     try {
       const queryParams = request.query as setContentRatingQuery;
