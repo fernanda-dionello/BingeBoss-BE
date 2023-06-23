@@ -3,7 +3,7 @@ import userContentValidators from "./validators/userContentValidators";
 import UserContent from "../models/userContentModel";
 import ContentRating from "../models/contentRatingModel";
 import { FastifyError } from 'fastify';
-import { getContentAmount, getContentName, getContentRuntime, getContentUrl, getDataHR } from './utils/content.utils';
+import { getContentAmount, getContentImage, getContentName, getContentRuntime, getContentUrl, getDataHR } from './utils/content.utils';
 import axios from 'axios';
 import { tokenTmdb } from '../config/commonVariables';
 import { fetchMultipleUrls, getOpenAIRecommendation, getRecommendedContentsDetailsUrlParams } from './utils/userContent.utils';
@@ -34,24 +34,27 @@ export default {
     let amount = 0;
     let episodeAmount = 0;
     let movieAmount = 0;
-    let name = '';
+
+    const url = getContentUrl({
+      id: contentId,
+      type: queryParams.type,
+      seasonNumber,
+      episodeNumber
+    });
+    
+    const contents = await axios.get(url, {
+      headers: { Authorization: tokenTmdb },
+      params: {
+        language: "en-US",
+      },
+    });
+
+    const name = getContentName(contents.data, queryParams.type);
+    const imagePath = getContentImage(contents.data, queryParams.type);
+    
     if (queryParams.status === 'watched') {
-      const url = getContentUrl({
-        id: contentId,
-        type: queryParams.type,
-        seasonNumber,
-        episodeNumber
-      });
-      
-      const contents = await axios.get(url, {
-        headers: { Authorization: tokenTmdb },
-        params: {
-          language: "en-US",
-        },
-      });
       runtime = getContentRuntime(contents.data, queryParams.type);
       amount = getContentAmount(contents.data, queryParams.type);
-      name = getContentName(contents.data, queryParams.type);
       episodeAmount = (queryParams.type === 'episode' || queryParams.type === 'season') 
       ? amount 
       : 0;
@@ -71,7 +74,8 @@ export default {
         contentRuntime: runtime,
         contentEpisodes: episodeAmount,
         contentMovie: movieAmount,
-        contentName: name
+        contentName: name,
+        backdrop_path: imagePath,
       },
       { new: true }
     );
@@ -86,7 +90,8 @@ export default {
         contentRuntime: runtime,
         contentEpisodes: episodeAmount,
         contentMovie: movieAmount,
-        contentName: name
+        contentName: name,
+        backdrop_path: imagePath,
       });
 
       return await userContent.save();
@@ -147,6 +152,10 @@ export default {
       {
         userId,
         contentStatus: contentStatus,
+        $or:[
+          {contentType: "movie"},
+          {contentType:"tv"}
+        ]
       }
     ).exec();
 

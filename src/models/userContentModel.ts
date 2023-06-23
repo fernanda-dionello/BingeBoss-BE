@@ -25,6 +25,7 @@ export interface UserContentDocument extends Document {
     contentEpisodes: number;
     contentMovie: number;
     contentName: string;
+    backdrop_path: string;
 }
 
 const userContentSchema = new mongoose.Schema({
@@ -65,6 +66,10 @@ const userContentSchema = new mongoose.Schema({
         required: true
     },
     contentName: {
+        type: String,
+        required: true
+    },
+    backdrop_path: {
         type: String,
         required: true
     },
