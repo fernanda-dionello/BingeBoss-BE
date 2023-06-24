@@ -5,6 +5,7 @@ import contentValidators from './validators/contentValidators';
 import ContentComment from "../models/contentCommentModel";
 import { FastifyError } from 'fastify';
 import { getContentUrl } from './utils/content.utils';
+import usersServices from './usersServices';
 
 export default {
   async getContentDetails(queryParams: contentDetailsQuery, id: string) {
@@ -46,7 +47,7 @@ export default {
     comment: string;
   }) {
     contentValidators.validateContentCommentQuery(queryParams);
-
+    const user = await usersServices.getById(userId);
     const seasonNumber: string =
        (queryParams.type === "episode" && queryParams.seasonNumber)
         ? queryParams.seasonNumber?.toString()
@@ -63,6 +64,7 @@ export default {
       episodeNumber,
       contentType: queryParams.type,
       comment,
+      userName: `${user.firstName} ${user.lastName}`
     });
 
     return await contentComment.save();

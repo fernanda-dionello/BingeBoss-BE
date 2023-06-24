@@ -16,10 +16,15 @@ export interface ContentCommentDocument extends Document {
     episodeNumber: string;
     contentType: string;
     comment: string;
+    userName: string;
 }
 
 const contentCommentSchema = new mongoose.Schema({
     userId: {
+        type: String,
+        required: true
+    },
+    userName: {
         type: String,
         required: true
     },
