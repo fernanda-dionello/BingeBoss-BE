@@ -11,7 +11,12 @@ import { generateCrypto } from './utils/crypto';
 export default {
   async showAll(request: FastifyRequest, reply: FastifyReply){
     try {
-      const users = await usersServices.getAll();
+      let users: UserAttrsResult[] = await usersServices.getAll();
+      users = users.map(user => {
+        user = user.toObject();
+        delete user.password;
+        return user
+      })
       return reply.send(users);
     } catch (err) {
       if (err instanceof mongoose.Error.CastError) {
@@ -25,7 +30,9 @@ export default {
   async showById(request: FastifyRequest, reply: FastifyReply){
     try {
       const { id } = request.params as UserParams;
-      const user = await usersServices.getById(id);
+      let user: UserAttrsResult = await usersServices.getById(id);
+      user = user.toObject();
+      delete user.password;
       return reply.send(user);
     } catch (err: any) {
       if (err instanceof mongoose.Error.CastError) {
@@ -72,7 +79,9 @@ export default {
       const user = request.body as UpdateUserAttrs; 
       const { id } = request.params as UserParams;
       const { id: userId } = request.user;
-      const updatedUser = await usersServices.updateById(user, id, userId);
+      let updatedUser: UserAttrsResult = await usersServices.updateById(user, id, userId);
+      updatedUser = updatedUser.toObject();
+      delete updatedUser.password;
       return reply.send(updatedUser);
     } catch (err: any) {
       if (err instanceof mongoose.Error.CastError) {
@@ -89,7 +98,9 @@ export default {
     try {
       const { id, isEnabled } = request.params as UserSpoilerProtectionParams;
       const { id: userId } = request.user;
-      const result = await usersServices.setSpoilerProtection(id, userId, isEnabled);
+      let result: UserAttrsResult = await usersServices.setSpoilerProtection(id, userId, isEnabled);
+      result = result.toObject();
+      delete result.password;
       return reply.code(200).send(result);
     } catch (err: any) {
       if (err instanceof mongoose.Error.CastError) {
