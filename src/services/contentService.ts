@@ -95,7 +95,7 @@ export default {
         seasonNumber,
         episodeNumber,
       }
-    );
+    ).sort({updatedAt: -1});
     if(contentComment.length == 0){
       const errHandler: FastifyError = {
         name:"Not found",
