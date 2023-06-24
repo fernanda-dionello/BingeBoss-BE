@@ -21,6 +21,11 @@ export interface UserParams {
     id: string;
 }
 
+export interface UserSpoilerProtectionParams {
+    id: string;
+    isEnabled: string;
+}
+
 export interface UserLoginAttrs {
     email: string;
     password: string;
@@ -31,6 +36,7 @@ export interface UserAttrsResult extends Document{
   lastName: string;
   email: string;
   password?: string;
+  spoilerProtection: boolean;
 }
 
 export interface UserModel extends Model<UserDocument> {
@@ -44,6 +50,7 @@ export interface UserDocument extends Document {
     password: string;
     createdAt: string;
     updatedAt: string;
+    spoilerProtection: boolean;
 }
 
 const userSchema = new mongoose.Schema(    {
@@ -64,7 +71,11 @@ const userSchema = new mongoose.Schema(    {
         type: String,
         required: true,
         select: true
-    }
+    },
+    spoilerProtection: {
+        type: Boolean,
+        required: true
+    },
 },
 {
     timestamps: true
