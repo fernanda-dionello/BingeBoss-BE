@@ -12,6 +12,7 @@ export default {
       id: userFounded[0].id,
       firstName: userFounded[0].firstName,
       lastName: userFounded[0].lastName,
+      email: userFounded[0].email,
       spoilerProtection: userFounded[0].spoilerProtection
   }, { expiresIn: "24h" });
     return token;
