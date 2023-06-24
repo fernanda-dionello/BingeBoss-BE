@@ -13,8 +13,9 @@ function UsersRoutes(
     next: (err?: FastifyError) => void
 ){
     fastify.get<{ Params: UserParams }>('/users/:id', usersController.showById);
-    fastify.put<{ Params: UserParams }>('/users/:id', usersController.updatebyId);
+    fastify.put<{ Params: UserParams }>('/users/:id', usersController.updateById);
     fastify.delete<{ Params: UserParams }>('/users/:id', usersController.deleteById);
+    fastify.put('/users/:id/spoiler/:isEnabled', usersController.setSpoilerProtection);
     next();
 }
 

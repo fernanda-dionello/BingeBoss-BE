@@ -79,5 +79,28 @@ export default {
       throw errHandler;
     }
     return updatedUser
+  },
+
+  async setSpoilerProtection(id: string, userId: string, isEnabled: string){
+    userValidators.validateSetSpoilerProtectionUserId(id, userId, isEnabled);  
+    const isSpoilerProtectionEnabled = (isEnabled === 'true');    
+    const user = await User.findByIdAndUpdate(
+      {_id: id}, 
+      {
+        spoilerProtection: isSpoilerProtectionEnabled,
+      },
+      { new: true }
+      ).exec();
+    
+    if(user == null){
+      const errHandler: FastifyError = {
+        name:"Not found",
+        message:"User not found",
+        statusCode: 404,
+        code: "404"
+      }
+      throw errHandler;
+    }
+    return user
   }
 }

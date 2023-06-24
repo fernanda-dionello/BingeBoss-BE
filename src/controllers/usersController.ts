@@ -2,7 +2,7 @@ import {
   FastifyRequest,
   FastifyReply
 } from 'fastify';
-import { UpdateUserAttrs, UserAttrs, UserAttrsResult, UserParams } from '../models/usersModel';
+import { UpdateUserAttrs, UserAttrs, UserAttrsResult, UserParams, UserSpoilerProtectionParams } from '../models/usersModel';
 import User from '../models/usersModel';
 import usersServices from '../services/usersServices';
 import mongoose from 'mongoose';
@@ -53,7 +53,7 @@ export default {
     try {
       const user = new User(request.body as UserAttrs); 
       user.password = generateCrypto(user.password);
-
+      user.spoilerProtection = true;
       let userCreated: UserAttrsResult = await user.save();
       userCreated = userCreated.toObject();
       delete userCreated.password;
@@ -67,7 +67,7 @@ export default {
     }
   },
 
-  async updatebyId(request: any, reply: FastifyReply){
+  async updateById(request: any, reply: FastifyReply){
     try {
       const user = request.body as UpdateUserAttrs; 
       const { id } = request.params as UserParams;
@@ -83,5 +83,19 @@ export default {
       }
       return reply.code(err.code || 500).send(err.message);
     }
-  }
+  },
+
+  async setSpoilerProtection(request: any, reply: FastifyReply){
+    try {
+      const { id, isEnabled } = request.params as UserSpoilerProtectionParams;
+      const { id: userId } = request.user;
+      const result = await usersServices.setSpoilerProtection(id, userId, isEnabled);
+      return reply.code(200).send(result);
+    } catch (err: any) {
+      if (err instanceof mongoose.Error.CastError) {
+        return reply.code(404).send("User not found.");
+      }
+      return reply.code(err.code || 500).send(err.message);
+    }
+  },
 }

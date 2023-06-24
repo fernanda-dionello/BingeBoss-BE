@@ -8,6 +8,10 @@ const UserLoginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
+const SpoilerProtectionSchema = Joi.object({
+  isEnabled: Joi.string().valid('true', 'false').required()
+});
+
 const UpdateUserSchema = Joi.object({
   firstName: Joi.string().required(),
   lastName: Joi.string().required(),
@@ -76,6 +80,17 @@ export default {
         result.error.details.map(({ message }) => message).join(";"),
         400,
         "400"
+      );
+    }
+  },
+
+  validateSetSpoilerProtectionUserId(id: string, userId: string, isEnabled: string) {
+    this.validateDeleteUserId(id, userId);
+    const result = SpoilerProtectionSchema.validate({isEnabled});
+    if (result.error) {
+      errorHandler(
+        "Bad request",
+        result.error.details.map(({ message }) => message).join(";")
       );
     }
   },
