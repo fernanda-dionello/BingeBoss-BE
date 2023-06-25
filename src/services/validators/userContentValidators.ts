@@ -10,13 +10,11 @@ const setContentStatusSchema = Joi.object({
   seasonNumber: Joi.number().when("type", {
     is: "season",
     then: Joi.number().required(),
-    otherwise: Joi.optional(),
   })
   .concat(
     Joi.number().when("type", {
       is: "episode",
       then: Joi.number().required(),
-      otherwise: Joi.optional(),
     })
   ),
   episodeNumber: Joi.number().when("type", {
@@ -31,13 +29,11 @@ const getContentStatusSchema = Joi.object({
   seasonNumber: Joi.number().when("type", {
     is: "season",
     then: Joi.number().required(),
-    otherwise: Joi.optional(),
   })
   .concat(
     Joi.number().when("type", {
       is: "episode",
       then: Joi.number().required(),
-      otherwise: Joi.optional(),
     })
   ),
   episodeNumber: Joi.number().when("type", {
