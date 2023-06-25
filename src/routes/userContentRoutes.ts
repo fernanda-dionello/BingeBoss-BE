@@ -13,6 +13,7 @@ function UserContentRoutes(
 ){
     fastify.post('/userContent/:id', userContentController.setContentStatus);
     fastify.get('/userContent/:id', userContentController.getContentStatus);
+    fastify.delete('/userContent/:id', userContentController.deleteContentStatus);
     fastify.get('/userContent/status/:status', userContentController.getContentByStatus);
     fastify.post('/userContent/:id/rating/:rate', userContentController.setContentRating);
     fastify.get('/userContent/:id/rating', userContentController.getContentRating);

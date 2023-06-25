@@ -74,6 +74,21 @@ export default {
     }
   },
 
+  async deleteContentStatus(request: any, reply: FastifyReply){
+    try {
+      const queryParams = request.query as setContentStatusQuery;
+      const { id: contentId } = request.params;
+      const { id: userId } = request.user;
+      const result = await userContentServices.deleteContentStatus({queryParams, contentId, userId});
+      return reply.send(result);
+    } catch (err: any) {
+      if (err instanceof mongoose.Error.CastError) {
+        return reply.code(404).send("Not found.");
+      }
+      return reply.code(err.code || 500).send(err.message);
+    }
+  },
+
   async setContentRating(request: any, reply: FastifyReply){
     try {
       const queryParams = request.query as setContentRatingQuery;
