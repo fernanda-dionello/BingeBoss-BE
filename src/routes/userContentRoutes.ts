@@ -13,7 +13,9 @@ function UserContentRoutes(
 ){
     fastify.post('/userContent/:id', userContentController.setContentStatus);
     fastify.get('/userContent/:id', userContentController.getContentStatus);
+    fastify.delete('/userContent/:id', userContentController.deleteContentStatus);
     fastify.get('/userContent/status/:status', userContentController.getContentByStatus);
+    fastify.get('/userContent/:id/watched/:seasonNumber', userContentController.getWatchedContentBySeasonNumber);
     fastify.post('/userContent/:id/rating/:rate', userContentController.setContentRating);
     fastify.get('/userContent/:id/rating', userContentController.getContentRating);
     fastify.get('/userContent/consumption', userContentController.getContentConsumption);

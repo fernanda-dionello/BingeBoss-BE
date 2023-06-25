@@ -142,6 +142,49 @@ export default {
     return userContent
   },
 
+  async deleteContentStatus({
+    queryParams,
+    contentId,
+    userId,
+  }: {
+    queryParams: getContentStatusQuery;
+    contentId: string;
+    userId: string;
+  }) {
+    userContentValidators.validateGetContentStatusQuery(queryParams);
+
+    const seasonNumber: string =
+      ((queryParams.type === "season" || queryParams.type === "episode")
+        && queryParams.seasonNumber)
+        ? queryParams.seasonNumber.toString()
+        : "-1";
+
+    const episodeNumber: string =
+      (queryParams.type === "episode" && queryParams.episodeNumber) 
+      ? queryParams.episodeNumber.toString()
+      : "-1";
+
+    const userContent = await UserContent.findOneAndDelete(
+      {
+        userId,
+        contentId,
+        contentType: queryParams.type,
+        seasonNumber,
+        episodeNumber,
+      }
+    );
+    if(userContent == null){
+      const errHandler: FastifyError = {
+        name:"Not found",
+        message:"User content not found",
+        statusCode: 404,
+        code: "404"
+      }
+      throw errHandler;
+    }
+    return userContent
+  },
+
   async getContentByStatus(
     userId: string,
     contentStatus: string,
@@ -155,6 +198,27 @@ export default {
         $or:[
           {contentType: "movie"},
           {contentType:"tv"}
+        ]
+      }
+    ).exec();
+
+    return userContent
+  },
+
+  async getWatchedContentBySeasonNumber(
+    userId: string,
+    id: string,
+    seasonNumber: string
+  ) {
+    const userContent = await UserContent.find(
+      {
+        userId,
+        contentStatus: "watched",
+        seasonNumber,
+        contentId: id,
+        $or:[
+          {contentType: "season"},
+          {contentType:"episode"}
         ]
       }
     ).exec();
