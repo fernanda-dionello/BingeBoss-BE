@@ -4,7 +4,7 @@ import UserContent from "../models/userContentModel";
 import ContentRating from "../models/contentRatingModel";
 import { FastifyError } from 'fastify';
 import { getContentAmount, getContentImage, getContentName, getContentRuntime, getContentUrl, getDataHR } from './utils/content.utils';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { tokenTmdb } from '../config/commonVariables';
 import { fetchMultipleUrls, getOpenAIRecommendation, getRecommendedContentsDetailsUrlParams } from './utils/userContent.utils';
 
@@ -30,11 +30,6 @@ export default {
         ? queryParams.episodeNumber.toString() 
         : "-1";
 
-    let runtime = 0;
-    let amount = 0;
-    let episodeAmount = 0;
-    let movieAmount = 0;
-
     const url = getContentUrl({
       id: contentId,
       type: queryParams.type,
@@ -49,28 +44,88 @@ export default {
       },
     });
 
-    const name = getContentName(contents.data, queryParams.type);
-    const imagePath = getContentImage(contents.data, queryParams.type);
+    if (queryParams.type === 'season') {
+      contents.data = contents.data.episodes.map((episode: any) => episode)
+    }
+    else {
+      contents.data = [contents.data]
+    }
+
+    const contentsToSave = contents.data.map((content: any) => {
+      return {
+        data: content,
+        type: queryParams.type === 'season' ? 'episode' : queryParams.type,
+        status: queryParams.status,
+        contentId,
+        userId,
+        episodeNumber: queryParams.type === 'season' ? content.episode_number : episodeNumber,
+        seasonNumber
+      }
+    })
     
-    if (queryParams.status === 'watched') {
-      runtime = getContentRuntime(contents.data, queryParams.type);
-      amount = getContentAmount(contents.data, queryParams.type);
-      episodeAmount = (queryParams.type === 'episode' || queryParams.type === 'season') 
+    const response: any[] = [];
+    contentsToSave.forEach(async (content: any) => {
+      const item = await this.findAndUpdateContentStatus({
+        type: content.type,
+        status: content.status,
+        contentId: content.contentId,
+        userId: content.userId,
+        episodeNumber: content.episodeNumber,
+        seasonNumber: content.seasonNumber,
+        data: content.data
+      });
+      response.push(item);
+    });
+
+    return response;
+  },
+
+  async findAndUpdateContentStatus({
+    type,
+    status,
+    contentId,
+    userId,
+    episodeNumber,
+    seasonNumber,
+    data
+  }: {
+    type: string;
+    status: string;
+    contentId: string;
+    userId: string;
+    episodeNumber: string;
+    seasonNumber: string;
+    data: AxiosResponse<any, any>
+  }) {
+
+    let runtime = 0;
+    let amount = 0;
+    let episodeAmount = 0;
+    let movieAmount = 0;
+
+    const name = getContentName(data, type);
+    const imagePath = getContentImage(data, type);
+    
+    if (status === 'watched') {
+      runtime = getContentRuntime(data, type);
+      amount = getContentAmount(data, type);
+      episodeAmount = (type === 'episode' || type === 'season') 
       ? amount 
       : 0;
-      movieAmount = queryParams.type === 'movie' 
+      movieAmount = type === 'movie' 
       ? amount
       : 0;
     }
+
     const userContentDb = await UserContent.findOneAndUpdate(
       {
         userId,
         contentId,
-        contentType: queryParams.type,
-        seasonNumber,
+        contentType: type,
         episodeNumber,
+        seasonNumber
       },
-      { contentStatus: queryParams.status,
+      { contentStatus: status,
         contentRuntime: runtime,
         contentEpisodes: episodeAmount,
         contentMovie: movieAmount,
@@ -83,10 +138,10 @@ export default {
       const userContent = new UserContent({
         userId,
         contentId,
-        seasonNumber,
         episodeNumber,
-        contentType: queryParams.type,
-        contentStatus: queryParams.status,
+        seasonNumber,
+        contentType: type,
+        contentStatus: status,
         contentRuntime: runtime,
         contentEpisodes: episodeAmount,
         contentMovie: movieAmount,
