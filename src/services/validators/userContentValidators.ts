@@ -88,10 +88,10 @@ export default {
   },
 
   validateSetContentRating(contentRating: string) {
-    if (!parseInt(contentRating) || parseInt(contentRating) < 1 || parseInt(contentRating) > 5){
+    if (!parseInt(contentRating) || parseInt(contentRating) < 1 || parseInt(contentRating) > 10){
       errorHandler(
         "Bad Request",
-        "Rating must be an integer from 1 to 5"
+        "Rating must be an integer from 1 to 10"
       );
     }
   },
