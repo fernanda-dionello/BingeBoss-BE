@@ -1,4 +1,4 @@
-import { getContentStatusQuery, setContentRatingQuery, setContentStatusQuery } from "../controllers/userContentController";
+import { ContentStatus, ContentType, getContentStatusQuery, setContentRatingQuery, setContentStatusQuery } from "../controllers/userContentController";
 import userContentValidators from "./validators/userContentValidators";
 import UserContent from "../models/userContentModel";
 import ContentRating from "../models/contentRatingModel";
@@ -51,7 +51,15 @@ export default {
       contents.data = [contents.data]
     }
 
-    const contentsToSave = contents.data.map((content: any) => {
+    const contentsToSave: {
+      data: any,
+      type: ContentType,
+      status: ContentStatus,
+      contentId: string,
+      userId: string,
+      episodeNumber: string,
+      seasonNumber: string,
+    }[] = contents.data.map((content: any) => {
       return {
         data: content,
         type: queryParams.type === 'season' ? 'episode' : queryParams.type,
@@ -63,6 +71,32 @@ export default {
       }
     })
     
+    if (contentsToSave.find((content: any) => 
+    content.type === 'episode' && content.status === 'watched'
+    )) {
+      const url = getContentUrl({
+        id: contentId,
+        type: 'tv',
+        seasonNumber,
+        episodeNumber
+      });
+      
+      const contents = await axios.get(url, {
+        headers: { Authorization: tokenTmdb },
+        params: {
+          language: "en-US",
+        },
+      });
+      contentsToSave.push({
+          data: contents.data,
+          type: 'tv',
+          status: 'watching',
+          contentId,
+          userId,
+          episodeNumber: '-1',
+          seasonNumber: '-1'
+      })
+    }
     const response: any[] = [];
     contentsToSave.forEach(async (content: any) => {
       const item = await this.findAndUpdateContentStatus({

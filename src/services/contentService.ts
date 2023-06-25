@@ -96,15 +96,6 @@ export default {
         episodeNumber,
       }
     ).sort({updatedAt: -1});
-    if(contentComment.length == 0){
-      const errHandler: FastifyError = {
-        name:"Not found",
-        message:"Comments not found",
-        statusCode: 404,
-        code: "404"
-      }
-      throw errHandler;
-    }
     return contentComment
   },
 };
