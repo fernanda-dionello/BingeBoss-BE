@@ -205,6 +205,27 @@ export default {
     return userContent
   },
 
+  async getWatchedContentBySeasonNumber(
+    userId: string,
+    id: string,
+    seasonNumber: string
+  ) {
+    const userContent = await UserContent.find(
+      {
+        userId,
+        contentStatus: "watched",
+        seasonNumber,
+        contentId: id,
+        $or:[
+          {contentType: "season"},
+          {contentType:"episode"}
+        ]
+      }
+    ).exec();
+
+    return userContent
+  },
+
   async setContentRating({
     queryParams,
     contentId,
