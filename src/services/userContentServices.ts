@@ -362,16 +362,6 @@ export default {
   }){
     userContentValidators.validateSetContentRatingQuery(queryParams);             
     const contentRating = await ContentRating.findOne({userId, contentId, contentType: queryParams.type}).exec();
-    
-    if(contentRating == null){
-      const errHandler: FastifyError = {
-        name:"Not found",
-        message:"Content rating not found",
-        statusCode: 404,
-        code: "404"
-      }
-      throw errHandler;
-    }
     return contentRating
   },
 
