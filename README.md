@@ -8,7 +8,7 @@ Mainly is a free responsive web platform (PWA) with educational purpose,  allowi
 - MongoDB
 
 ## Api
-- [TMDB](https://developer.themoviedb.org/reference/intro/getting-started)
+- [TMDB](https://www.themoviedb.org)
 - [OpenAI](https://openai.com/)
 
 ## How to start
