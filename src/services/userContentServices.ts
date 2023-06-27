@@ -402,7 +402,7 @@ export default {
     const watchedContent = await UserContent.find(
       {
         userId, 
-        contentStatus: 'watched', 
+        contentStatus: { $in: ["watched", "watching"] },
         $or:[
           {contentType: "movie"},
           {contentType:"tv"}

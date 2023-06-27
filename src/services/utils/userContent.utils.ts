@@ -3,7 +3,7 @@ import { openai } from '../../config/openAI';
 import { tokenTmdb } from '../../config/commonVariables';
 
 export const getOpenAIRecommendation = async (watchedContentNames: string[]): Promise<string[]> => {
-  let chatCompletionContent = "Based on these series and movies in array of strings format below, give me 10 series and movies recommendation with the titles in just one string splited by comma, don't write anything else, just the string:";
+  let chatCompletionContent = "Based on these series and movies in array of strings format below, give me 10 series and movies recommendation with the titles in just one string splited by comma, don't write anything else, just the string, and don't repeat the same titles that are in the array of strings: ";
     chatCompletionContent = `${chatCompletionContent} [${watchedContentNames}]`;
   
     const completion = await openai.createChatCompletion({
